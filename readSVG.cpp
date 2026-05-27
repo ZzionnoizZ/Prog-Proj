@@ -9,6 +9,9 @@
 using namespace std;
 using namespace tinyxml2;
 
+// declaração de novas funções
+svg::Point Recolher(string s){}
+
 namespace svg
 {
     void readSVG(const string& svg_file, Point& dimensions, vector<SVGElement *>& svg_elements)
@@ -25,6 +28,8 @@ namespace svg
         dimensions.y = xml_elem->IntAttribute("height");
         
         // TODO complete code -->
+
+        //criar func que retorna pontos
 
         XMLElement *g = xml_elem->FirstChildElement();
         for (XMLElement *elemento = g->FirstChildElement(); elemento != nullptr; elemento = elemento->NextSiblingElement()){
@@ -54,21 +59,40 @@ namespace svg
 
             else if (name == "polyline"){
                 std::istringstream pontos(elemento-> Attribute("points"));
-                string ponto;
+                string ponto, func, dados;
                 vector<Point> points;
+                string trans = elemento->Attribute("transform");
+                std::istringstream t(trans);
+                char b1 = '(', b2 = ')';
                 while (pontos >> ponto){
-                    char v=',';
-                    string x, y;
-                    std::istringstream point(ponto);
-                    while (point >> x >> v >> y){
-                        int x_ = std::stoi(x);
-                        int y_ = std::stoi(y);
-                        points.push_back({x_,y_});
-                    }
+                    Point p =Recolher(ponto);
+                        if (!trans.empty()){
+                            while (t >> func >> b1 >> dados >> b2){
+                                if (func == "translate"){
+                                    std::istringstream d(dados);
+                                    Point t;
+                                    string x1, y1;
+                                    while (d >> x1 >> y1){
+                                        int x_1 = std::stoi(x1);
+                                        int y_1 = std::stoi(y1);
+                                        t = {x_1, y_1};
+                                    }
+                                    p.translate(t);
+                                }
+                                else if (func == "rotate"){
+                                    int degree = std::stoi(dados);
+                                    string trans_or = elemento->Attribute("transform-origin");
+                                    Point o = Recolher(trans_or);
+                                    p.rotate(o, degree);
+                                }
+                            }
+                        }   
+                    points.push_back(p);
                 }
                 const char* stroke = elemento->Attribute("stroke");
                 Color cor = parse_color(stroke ? stroke : "black");
                 svg_elements.push_back(new Polyline(points, cor));
+                
             }
 
             else if (name == "line"){
@@ -76,6 +100,28 @@ namespace svg
                 int y1 = elemento->IntAttribute("y1");
                 int x2 = elemento->IntAttribute("x2");
                 int y2 = elemento->IntAttribute("y2");
+                string func, dados;
+                vector<Point> points;
+                string trans = elemento->Attribute("transform");
+                std::istringstream t(trans);
+                char b1 = '(', b2 = ')';
+                while (t >> func >> b1 >> dados >> b2){
+                    if (!trans.empty()){
+                        Point p1 = {x1, y1};
+                        Point p2 = {x2, y2};
+                        if (trans ==  "translate"){
+                            p1.translate(Recolher(dados));
+                            p2.translate(Recolher(dados));
+                        }
+                        if (trans == "rotate"){
+                            int degree = std::stoi(dados);
+                            string trans_or = elemento->Attribute("transform-origin");
+                            Point o = Recolher(trans_or);
+                            p1.rotate(o, degree);
+                            p2.rotate(o, degree);
+                        }
+                    }
+                }
                 const char* stroke = elemento->Attribute("stroke");
                 Color cor = parse_color(stroke ? stroke : "black");
                 svg_elements.push_back(new Line(x1, y1, x2, y2, cor));
@@ -111,4 +157,18 @@ namespace svg
             }
         }
     }   
+}
+
+svg::Point Recolher(string s){
+    std::istringstream ss(s);
+    string x,y;
+    char sep;
+    int x_, y_;
+    while (ss >> x >> sep >> y){
+        x_ = std::stoi(x);
+        y_ = std::stoi(y);
+    }
+    svg::Point p = {x_, y_};
+    return p;
+
 }

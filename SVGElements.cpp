@@ -27,12 +27,22 @@ namespace svg
     // HERE -->
     // void SVGElement::draw(PNGImage &img) const = 0{
 
+
+    // Ellipse
+
+
+
+    // Circle
+
     Circle::Circle(const Color &fill, const Point &center, const int &radius): Ellipse(fill, center, {radius, radius}){}
 
     void Circle::Ellipse::draw(PNGImage &img) const
     {
         img.draw_ellipse(center, radius, fill);
     }
+    
+
+    // Polyline
 
     Polyline::Polyline(const vector<Point> &points,const Color &Stroke): points(points), stroke(stroke){}
 
@@ -43,6 +53,10 @@ namespace svg
         }
     }
 
+
+    // Line
+
+
     Line::Line(int x1, int y1, int x2, int y2, const Color &stroke): Polyline({{x1,y1},{x2,y2}}, stroke){}
 
     void Line::draw(PNGImage &img) const
@@ -50,22 +64,25 @@ namespace svg
         img.draw_line({x1,y1},{x2,y2}, stroke);
     }
 
-    Polygon::Polygon(vector<Point> &points, Color &fill): points(points), fill(fill){}
+
+    // Polygon
+
+
+    Polygon::Polygon(const vector<Point> &points, Color &fill): points(points), fill(fill){}
 
     void Polygon::draw(PNGImage &img) const
     {
         img.draw_polygon(points, fill);
     }
 
-    Rect::Rect(int &x, int &y, int width, int height, Color &fill): Rect({{x,y},{x+width,y},{x+width,y-height},{x,y-height},{x,y}}, fill){}
+
+    // Rect 
+
+
+    Rect::Rect(int x, int y, int width, int height, Color &fill): Polygon({{x,y},{x+width,y},{x+width,y-height},{x,y+height},{x,y}}, fill), x(x), y(y), width(width), height(height){}
 
     void Rect::Polygon::draw(PNGImage &img) const
     {
         img.draw_polygon(points, fill);
     }
-}
-
-int main(){
-    std::vector<svg::Point> v = vector<svg::Point>{};
-    return 0;
 }

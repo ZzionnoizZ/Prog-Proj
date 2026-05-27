@@ -6,6 +6,10 @@
 #include "Point.hpp"
 #include "PNGImage.hpp"
 
+//Novas Bibliotecas
+#include<vector>
+using std::vector;
+
 namespace svg
 {
     class SVGElement
@@ -15,6 +19,11 @@ namespace svg
         SVGElement();
         virtual ~SVGElement();
         virtual void draw(PNGImage &img) const = 0;
+
+        // NEW declarations
+        virtual Point translate(const Point &t) const = 0;
+        virtual Point rotate(const Point &origin, int degrees) const = 0;
+        virtual Point scale(const Point &origin, int v) const = 0;
     };
 
     // Declaration of namespace functions
@@ -32,6 +41,9 @@ namespace svg
     public:
         Ellipse(const Color &fill, const Point &center, const Point &radius);
         void draw(PNGImage &img) const override;
+        Point translate(const Point &t) const override;
+        Point rotate(const Point &origin, int degrees) const override;
+        Point scale(const Point &origin, int v) const override; 
 
     private:
         Color fill;
@@ -45,12 +57,18 @@ namespace svg
         public:
             Circle(const Color &fill, const Point &center, const int &radius);
             void draw(PNGImage &img) const override;
+            Point translate(const Point &t) const override;
+            Point rotate(const Point &origin, int degrees) const override;
+            Point scale(const Point &origin, int v) const override;
     };
 
     class Polyline: public SVGElement{
         public:
         Polyline(const vector<Point> &points,const Color &Stroke);
         void draw(PNGImage &img) const override;
+        Point translate(const Point &t) const override;
+        Point rotate(const Point &origin, int degrees) const override;
+        Point scale(const Point &origin, int v) const override;
         
         private:
         vector<Point> points;
@@ -61,6 +79,9 @@ namespace svg
         public:
         Line(int x1, int y1, int x2, int y2, const Color &stroke);
         void draw(PNGImage &img) const override;
+        Point translate(const Point &t) const override;
+        Point rotate(const Point &origin, int degrees) const override;
+        Point scale(const Point &origin, int v) const override;
 
         private:
         int x1,x2,y1,y2;
@@ -69,8 +90,11 @@ namespace svg
 
     class Polygon: public SVGElement{
         public:
-        Polygon(vector<Point> &points, Color &fill);
+        Polygon(const vector<Point> &points, Color &fill);
         void draw(PNGImage &img) const override;
+        Point translate(const Point &t) const override;
+        Point rotate(const Point &origin, int degrees) const override;
+        Point scale(const Point &origin, int v) const override;
 
         private:
         vector<Point> points;
@@ -79,12 +103,16 @@ namespace svg
 
     class Rect: public Polygon{
         public:
-        Rect(int &x, int &y, int width, int height, Color &fill);
-        Rect(vector<Point> vec, Color& fill);
+        Rect(int x, int y, int width, int height, Color &fill);        
         void draw(PNGImage &img) const override;
+        Point translate(const Point &t) const override;
+        Point rotate(const Point &origin, int degrees) const override;
+        Point scale(const Point &origin, int v) const override;
 
         private:
         int x, y, width, height;
+        Color fill;
     };
-}
+};
+
 #endif
