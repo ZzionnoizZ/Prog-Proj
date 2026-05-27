@@ -41,5 +41,74 @@ namespace svg
                 Color cor = parse_color(fill ? fill : "black");
                 svg_elements.push_back(new Ellipse(cor,center,radius));
             }
+            
+            else if (name == "circle"){
+                int cx = elemento->IntAttribute("cx");
+                int cy = elemento->IntAttribute("cy");
+                const Point center = {cx, cy};
+                int r = elemento->IntAttribute("r");
+                const char* fill = elemento->Attribute("fill");
+                Color cor = parse_color(fill ? fill : "black");
+                svg_elements.push_back(new Circle(cor,center,r));
+            }
+
+            else if (name == "polyline"){
+                std::istringstream pontos(elemento-> Attribute("points"));
+                string ponto;
+                vector<Point> points;
+                while (pontos >> ponto){
+                    char v=',';
+                    string x, y;
+                    std::istringstream point(ponto);
+                    while (point >> x >> v >> y){
+                        int x_ = std::stoi(x);
+                        int y_ = std::stoi(y);
+                        points.push_back({x_,y_});
+                    }
+                }
+                const char* stroke = elemento->Attribute("stroke");
+                Color cor = parse_color(stroke ? stroke : "black");
+                svg_elements.push_back(new Polyline(points, cor));
+            }
+
+            else if (name == "line"){
+                int x1 = elemento->IntAttribute("x1");
+                int y1 = elemento->IntAttribute("y1");
+                int x2 = elemento->IntAttribute("x2");
+                int y2 = elemento->IntAttribute("y2");
+                const char* stroke = elemento->Attribute("stroke");
+                Color cor = parse_color(stroke ? stroke : "black");
+                svg_elements.push_back(new Line(x1, y1, x2, y2, cor));
+            }
+
+            else if (name == "polygon"){
+                std::istringstream pontos(elemento-> Attribute("points"));
+                string ponto;
+                vector<Point> points;
+                while (pontos >> ponto){
+                    char v=',';
+                    string x, y;
+                    std::istringstream point(ponto);
+                    while (point >> x >> v >> y){
+                        int x_ = std::stoi(x);
+                        int y_ = std::stoi(y);
+                        points.push_back({x_,y_});
+                    }
+                }
+                const char* fill = elemento->Attribute("fill");
+                Color cor = parse_color(fill ? fill : "black");
+                svg_elements.push_back(new Polygon(points, cor));
+            }
+
+            else if (name == "rect"){
+                int x = elemento->IntAttribute("x");
+                int y = elemento->IntAttribute("y");
+                int width = elemento->IntAttribute("width");
+                int height = elemento->IntAttribute("height");
+                const char* fill = elemento->Attribute("fill");
+                Color cor = parse_color(fill ? fill : "black");
+                svg_elements.push_back(new Rect(x, y, width, height, cor));
+            }
         }
     }   
+}
