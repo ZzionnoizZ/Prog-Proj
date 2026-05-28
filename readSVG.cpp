@@ -10,7 +10,11 @@ using namespace std;
 using namespace tinyxml2;
 
 // declaração de novas funções
-svg::Point Recolher(string s){}
+svg::Point Recolher(string s);
+int Recolher_rs(string s);
+string funcao(string s);
+string dados (string s);
+
 
 namespace svg
 {
@@ -42,6 +46,38 @@ namespace svg
                 int rx = elemento->IntAttribute("rx");
                 int ry = elemento->IntAttribute("ry");
                 const Point radius = {rx, ry};
+                string transform = "";
+                transform = elemento->Attribute("transform");
+                if (transform != ""){
+                    string nome = funcao(transform);
+                    if (nome == "translate"){
+                        Point t = Recolher(dados(transform));
+                        center.translate(t);
+                    }
+                    string trans_or = "";
+                    trans_or = elemento->Attribute("transform-origin");
+                    if (trans_or != ""){
+                        Point o = Recolher(trans_or);
+                        if (nome == "rotate"){
+                            int a = Recolher_rs(dados(transform));
+                            center.rotate(o, a);
+                        }
+                        else if (nome == "scale"){
+                            int a = Recolher_rs(transform);
+                            center.scale(o, a);
+                        }
+                    }
+                    else {
+                        if (nome == "rotate"){
+                            int a = Recolher_rs(dados(transform));
+                            center.rotate({0,0}, a);
+                        }
+                        else if (nome == "scale"){
+                            int a = Recolher_rs(transform);
+                            center.scale({0,0}, a);
+                        }
+                    }
+                }
                 const char* fill = elemento->Attribute("fill");
                 Color cor = parse_color(fill ? fill : "black");
                 svg_elements.push_back(new Ellipse(cor,center,radius));
@@ -52,6 +88,38 @@ namespace svg
                 int cy = elemento->IntAttribute("cy");
                 const Point center = {cx, cy};
                 int r = elemento->IntAttribute("r");
+                string transform = "";
+                transform = elemento->Attribute("transform");
+                if (transform != ""){
+                    string nome = funcao(transform);
+                    if (nome == "translate"){
+                        Point t = Recolher(dados(transform));
+                        center.translate(t);
+                    }
+                    string trans_or = "";
+                    trans_or = elemento->Attribute("transform-origin");
+                    if (trans_or != ""){
+                        Point o = Recolher(trans_or);
+                        if (nome == "rotate"){
+                            int a = Recolher_rs(dados(transform));
+                            center.rotate(o, a);
+                        }
+                        else if (nome == "scale"){
+                            int a = Recolher_rs(transform);
+                            center.scale(o, a);
+                        }
+                    }
+                    else {
+                        if (nome == "rotate"){
+                            int a = Recolher_rs(dados(transform));
+                            center.rotate({0,0}, a);
+                        }
+                        else if (nome == "scale"){
+                            int a = Recolher_rs(transform);
+                            center.scale({0,0}, a);
+                        }
+                    }
+                }
                 const char* fill = elemento->Attribute("fill");
                 Color cor = parse_color(fill ? fill : "black");
                 svg_elements.push_back(new Circle(cor,center,r));
@@ -162,13 +230,33 @@ namespace svg
 svg::Point Recolher(string s){
     std::istringstream ss(s);
     string x,y;
-    char sep;
     int x_, y_;
-    while (ss >> x >> sep >> y){
+    while (ss >> x >> y){
         x_ = std::stoi(x);
         y_ = std::stoi(y);
     }
     svg::Point p = {x_, y_};
     return p;
 
+}
+
+int Recolher_rs(string s){
+    std::istringstream ss(s);
+    string d;
+    int d_;
+    while (ss >> d){
+        d_ = std::stoi(d);
+    }
+    return d_;
+}
+
+string funcao(string s){
+    int idx = s.find_first_of('(');
+    return s.substr(0,idx-1);
+}
+
+string dados(string s){
+    int idx_i = s.find_first_of('(');
+    int idx_f = s.find_last_of(')');
+    return s.substr(idx_i+1,idx_f-1);
 }

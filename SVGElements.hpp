@@ -45,7 +45,7 @@ namespace svg
         Point rotate(const Point &origin, int degrees) const override;
         Point scale(const Point &origin, int v) const override; 
 
-    private:
+    protected: // private -> protected
         Color fill;
         Point center;
         Point radius;
@@ -64,13 +64,13 @@ namespace svg
 
     class Polyline: public SVGElement{
         public:
-        Polyline(const vector<Point> &points,const Color &Stroke);
+        Polyline(const vector<Point> &points,const Color &stroke);
         void draw(PNGImage &img) const override;
         Point translate(const Point &t) const override;
         Point rotate(const Point &origin, int degrees) const override;
         Point scale(const Point &origin, int v) const override;
         
-        private:
+        protected:
         vector<Point> points;
         Color stroke;
     };
@@ -85,7 +85,6 @@ namespace svg
 
         private:
         int x1,x2,y1,y2;
-        Color stroke;
     };
 
     class Polygon: public SVGElement{
@@ -96,7 +95,7 @@ namespace svg
         Point rotate(const Point &origin, int degrees) const override;
         Point scale(const Point &origin, int v) const override;
 
-        private:
+        protected:
         vector<Point> points;
         Color fill;
     };
@@ -111,7 +110,6 @@ namespace svg
 
         private:
         int x, y, width, height;
-        Color fill;
     };
 };
 
