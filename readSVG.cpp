@@ -29,7 +29,7 @@ namespace svg
         
         // TODO complete code -->
 
-        //criar func que retorna pontos :)
+        //criar func que retorna pontos
 
         XMLElement *g = xml_elem->FirstChildElement();
         for (XMLElement *elemento = g->FirstChildElement(); elemento != nullptr; elemento = elemento->NextSiblingElement()){
