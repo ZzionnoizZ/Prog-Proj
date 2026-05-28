@@ -31,101 +31,132 @@ namespace svg
 
     // Ellipse
 
-    Point Ellipse::translate(const Point &t) const{
-        return center.translate(t);
+    void Ellipse::translate(const Point &t){
+        center = center.translate(t);
     }
 
-    Point Ellipse::rotate(const Point &origin, int degrees) const{
-        return center.rotate(origin, degrees);
+    void Ellipse::rotate(const Point &origin, int degrees){
+        center = center.rotate(origin, degrees);
     }
 
-    Point Ellipse::scale(const Point &origin, int v) const{
-        return center.scale(origin,v);
+    void Ellipse::scale(const Point &origin, int v){
+        center = center.scale(origin,v);
+        radius = radius.scale({0, 0}, v);
     }
 
     // Circle
 
     Circle::Circle(const Color &fill, const Point &center, const int &radius): Ellipse(fill, center, {radius, radius}){}
 
-    void Circle::draw(PNGImage &img) const
-    {
-        img.draw_ellipse(center, radius, fill);
+    void Circle::draw(PNGImage &img) const{
+        img.draw_ellipse(center, radius, fill); // pode ser Ellipse::draw(img);
     }
     
-    Point Circle::translate(const Point &t) const{
-        return Ellipse::translate(t);
+    void Circle::translate(const Point &t){
+        Ellipse::translate(t);
     }
-    Point Circle::rotate(const Point &origin, int degrees) const{
-        return Ellipse::rotate(origin, degrees);
+    void Circle::rotate(const Point &origin, int degrees){
+        Ellipse::rotate(origin, degrees);
     }
 
-    Point Circle::scale(const Point &origin, int v) const{
-        return Ellipse::scale(origin,v);
+    void Circle::scale(const Point &origin, int v){
+        Ellipse::scale(origin,v);
     }
 
     // Polyline
 
     Polyline::Polyline(const vector<Point> &points,const Color &stroke): points(points), stroke(stroke){}
 
-    void Polyline::draw(PNGImage &img) const
-    {
+    void Polyline::draw(PNGImage &img) const{
         for (size_t i=1; i<points.size(); i++){
             img.draw_line(points[i-1], points[i], stroke);
         }
     }
 
-    Point Polyline::translate(const Point &t) const{}
+    void Polyline::translate(const Point &t){
+        for (Point& p: points){
+            p = p.translate(t);
+        }
+    }
 
-    Point Polyline::rotate(const Point &origin, int degrees) const{}
+    void Polyline::rotate(const Point &origin, int degrees){
+        for (Point& p: points){
+            p = p.rotate(origin, degrees);
+        }
+    }
 
-    Point Polyline::scale(const Point &origin, int v) const{}
+    void Polyline::scale(const Point &origin, int v){
+        for (Point &p : points){
+            p = p.scale(origin, v);
+        } 
+    }
 
     // Line
 
 
     Line::Line(int x1, int y1, int x2, int y2, const Color &stroke): Polyline({{x1,y1},{x2,y2}}, stroke){}
 
-    void Line::draw(PNGImage &img) const
-    {
-        img.draw_line({x1,y1},{x2,y2}, stroke);
+    void Line::draw(PNGImage &img) const{
+        img.draw_line({x1,y1},{x2,y2}, stroke); // Polyline::draw(points, stroke);
     }
 
-    Point Line::translate(const Point &t) const{} // RECURSIVIDADE !!
+    void Line::translate(const Point &t){
+        Polyline::translate(t);
+    } 
 
-    Point Line::rotate(const Point &origin, int degrees) const{}
+    void Line::rotate(const Point &origin, int degrees){
+        Polyline::rotate(origin, degrees);
+    }
 
-    Point Line::scale(const Point &origin, int v) const{}
+    void Line::scale(const Point &origin, int v){
+        Polyline::scale(origin, v); // não sei se é preciso por v = 1;
+    }
 
     // Polygon
 
 
     Polygon::Polygon(const vector<Point> &points, Color &fill): points(points), fill(fill){}
 
-    void Polygon::draw(PNGImage &img) const
-    {
+    void Polygon::draw(PNGImage &img) const{
         img.draw_polygon(points, fill);
     }
 
-    Point Polygon::translate(const Point &t) const{}
+    void Polygon::translate(const Point &t){
+        for (Point& p: points){
+            p = p.translate(t);
+        }
+    }
 
-    Point Polygon::rotate(const Point &origin, int degrees) const{}
+    void Polygon::rotate(const Point &origin, int degrees){
+        for (Point& p: points){
+            p = p.rotate(origin, degrees);
+        }
+    }
 
-    Point Polygon::scale(const Point &origin, int v) const{}
-
+    void Polygon::scale(const Point &origin, int v){
+        for (Point &p : points){
+            p = p.scale(origin, v);
+        } 
+    }
 
     // Rect 
 
 
     Rect::Rect(int x, int y, int width, int height, Color &fill): Polygon({{x,y},{x+width,y},{x+width,y-height},{x,y+height},{x,y}}, fill), x(x), y(y), width(width), height(height){}
 
-    void Rect::draw(PNGImage &img) const
-    {
-        img.draw_polygon(points, fill);
+    void Rect::draw(PNGImage &img) const{
+        img.draw_polygon(points, fill); // Rect::draw(points, fill);
     }
 
-    Point Rect::translate(const Point &t) const{}
+    void Rect::translate(const Point &t){
+        Polygon::translate(t);
+    } 
 
-    Point Rect::rotate(const Point &origin, int degrees) const{}
+    void Rect::rotate(const Point &origin, int degrees){
+        Polygon::rotate(origin, degrees);
+    }
 
-    Point Rect::scale(const Point &origin, int v) const{}
+    void Rect::scale(const Point &origin, int v){
+        Polygon::scale(origin, v); // não sei se é preciso por v = 1;
+    }
 }

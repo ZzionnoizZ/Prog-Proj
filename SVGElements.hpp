@@ -21,9 +21,9 @@ namespace svg
         virtual void draw(PNGImage &img) const = 0;
 
         // NEW declarations
-        virtual Point translate(const Point &t) const = 0;
-        virtual Point rotate(const Point &origin, int degrees) const = 0;
-        virtual Point scale(const Point &origin, int v) const = 0;
+        virtual void translate(const Point &t) = 0;
+        virtual void rotate(const Point &origin, int degrees) = 0;
+        virtual void scale(const Point &origin, int v) = 0;
     };
 
     // Declaration of namespace functions
@@ -41,9 +41,9 @@ namespace svg
     public:
         Ellipse(const Color &fill, const Point &center, const Point &radius);
         void draw(PNGImage &img) const override;
-        Point translate(const Point &t) const override;
-        Point rotate(const Point &origin, int degrees) const override;
-        Point scale(const Point &origin, int v) const override; 
+        void translate(const Point &t) override;
+        void rotate(const Point &origin, int degrees) override;
+        void scale(const Point &origin, int v) override; 
 
     protected: // private -> protected
         Color fill;
@@ -57,18 +57,18 @@ namespace svg
         public:
             Circle(const Color &fill, const Point &center, const int &radius);
             void draw(PNGImage &img) const override;
-            Point translate(const Point &t) const override;
-            Point rotate(const Point &origin, int degrees) const override;
-            Point scale(const Point &origin, int v) const override;
+            void translate(const Point &t) override;
+            void rotate(const Point &origin, int degrees) override;
+            void scale(const Point &origin, int v) override;
     };
 
     class Polyline: public SVGElement{
         public:
         Polyline(const vector<Point> &points,const Color &stroke);
         void draw(PNGImage &img) const override;
-        Point translate(const Point &t) const override;
-        Point rotate(const Point &origin, int degrees) const override;
-        Point scale(const Point &origin, int v) const override;
+        void translate(const Point &t) override;
+        void rotate(const Point &origin, int degrees) override;
+        void scale(const Point &origin, int v) override;
         
         protected:
         vector<Point> points;
@@ -79,9 +79,9 @@ namespace svg
         public:
         Line(int x1, int y1, int x2, int y2, const Color &stroke);
         void draw(PNGImage &img) const override;
-        Point translate(const Point &t) const override;
-        Point rotate(const Point &origin, int degrees) const override;
-        Point scale(const Point &origin, int v) const override;
+        void translate(const Point &t) override;
+        void rotate(const Point &origin, int degrees) override;
+        void scale(const Point &origin, int v) override;
 
         private:
         int x1,x2,y1,y2;
@@ -91,9 +91,9 @@ namespace svg
         public:
         Polygon(const vector<Point> &points, Color &fill);
         void draw(PNGImage &img) const override;
-        Point translate(const Point &t) const override;
-        Point rotate(const Point &origin, int degrees) const override;
-        Point scale(const Point &origin, int v) const override;
+        void translate(const Point &t) override;
+        void rotate(const Point &origin, int degrees) override;
+        void scale(const Point &origin, int v) override;
 
         protected:
         vector<Point> points;
@@ -104,9 +104,9 @@ namespace svg
         public:
         Rect(int x, int y, int width, int height, Color &fill);        
         void draw(PNGImage &img) const override;
-        Point translate(const Point &t) const override;
-        Point rotate(const Point &origin, int degrees) const override;
-        Point scale(const Point &origin, int v) const override;
+        void translate(const Point &t) override;
+        void rotate(const Point &origin, int degrees) override;
+        void scale(const Point &origin, int v) override;
 
         private:
         int x, y, width, height;
