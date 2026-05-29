@@ -60,7 +60,7 @@ namespace svg
     }
 
     void Circle::draw(PNGImage &img) const{
-        img.draw_ellipse(center, radius, fill); // pode ser Ellipse::draw(img);
+        Ellipse::draw(img);
     }
 
     // Polyline
@@ -105,11 +105,11 @@ namespace svg
     }
 
     void Line::scale(const Point &origin, int v){
-        Polyline::scale(origin, v); // não sei se é preciso por v = 1;
+        Polyline::scale(origin, v); 
     }
 
     void Line::draw(PNGImage &img) const{
-        img.draw_line(points[0], points[1], stroke); // Polyline::draw(points, stroke);
+        Polyline::draw(img);
     }
 
     // Polygon
@@ -142,7 +142,7 @@ namespace svg
     // Rect 
 
 
-    Rect::Rect(int x, int y, int width, int height, const Color &fill): Polygon({{x,y},{x+width,y},{x+width,y+height},{x,y+height}}, fill), x(x), y(y), width(width), height(height){}
+    Rect::Rect(int x, int y, int width, int height, const Color &fill): Polygon({{x,y},{x+width-1,y},{x+width-1,y+height-1},{x,y+height-1}}, fill), x(x), y(y), width(width), height(height){}
 
     void Rect::translate(const Point &t){
         Polygon::translate(t);
@@ -153,10 +153,10 @@ namespace svg
     }
 
     void Rect::scale(const Point &origin, int v){
-        Polygon::scale(origin, v); // não sei se é preciso por v = 1;
+        Polygon::scale(origin, v); 
     }
 
     void Rect::draw(PNGImage &img) const{
-        img.draw_polygon(points, fill); // Rect::draw(points, fill);
+        Polygon::draw(img);
     }
 }

@@ -80,7 +80,7 @@ namespace svg
         }
         else if (name == "line"){
             int x1 = elemento->IntAttribute("x1");
-              int y1 = elemento->IntAttribute("y1");
+            int y1 = elemento->IntAttribute("y1");
             int x2 = elemento->IntAttribute("x2");
             int y2 = elemento->IntAttribute("y2");
             string func, dados;
@@ -90,23 +90,16 @@ namespace svg
             elem = (new Line(x1, y1, x2, y2, cor));
         }
         else if (name == "polygon"){
-                std::istringstream pontos(elemento-> Attribute("points"));
-                string ponto;
-                vector<Point> points;
-                while (pontos >> ponto){
-                    char v=',';
-                    string x, y;
-                    std::istringstream point(ponto);
-                    while (point >> x >> v >> y){
-                        int x_ = std::stoi(x);
-                        int y_ = std::stoi(y);
-                        points.push_back({x_,y_});
-                    }
-                }
-                const char* fill = elemento->Attribute("fill");
-                Color cor = parse_color(fill);
-                elem = (new Polygon(points, cor));
+            std::istringstream pontos(elemento-> Attribute("points"));
+            string ponto;
+            vector<Point> points;
+            while (pontos >> ponto){
+                points.push_back(Recolher(ponto));
             }
+            const char* fill = elemento->Attribute("fill");
+            Color cor = parse_color(fill);
+            elem = (new Polygon(points, cor));
+        }
         else if (name == "rect"){
             int x = elemento->IntAttribute("x");
             int y = elemento->IntAttribute("y");
@@ -134,7 +127,7 @@ namespace svg
                     elem->rotate(origin, a);
                 }
                 else if (nome == "scale"){
-                    int a = Recolher_rs(transform);
+                    int a = Recolher_rs(dados(transform));
                     elem->scale(origin, a);
                 }
             }
@@ -149,11 +142,10 @@ namespace svg
 svg::Point Recolher(string s){
     for(auto &c : s) if(c == ',') c = ' ';
     std::istringstream ss(s);
-    string x,y;
-    int x_, y_;
+    int x_, y_, x, y;
     while (ss >> x >> y){
-        x_ = std::stoi(x);
-        y_ = std::stoi(y);
+        x_ = x;
+        y_ = y;
     }
     svg::Point p = {x_, y_};
     return p;
@@ -162,10 +154,9 @@ svg::Point Recolher(string s){
 
 int Recolher_rs(string s){
     std::istringstream ss(s);
-    string d;
-    int d_;
+    int d_, d;
     while (ss >> d){
-        d_ = std::stoi(d);
+        d_ = d;
     }
     return d_;
 }
