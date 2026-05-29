@@ -31,6 +31,7 @@ namespace svg
 
     // Ellipse
 
+
     void Ellipse::translate(const Point &t){
         center = center.translate(t);
     }
@@ -45,6 +46,7 @@ namespace svg
     }
 
     // Circle
+
 
     Circle::Circle(const Color &fill, const Point &center, const int &radius): Ellipse(fill, center, {radius, radius}){}
     
@@ -64,6 +66,7 @@ namespace svg
     }
 
     // Polyline
+
 
     Polyline::Polyline(const vector<Point> &points,const Color &stroke): points(points), stroke(stroke){}
 
@@ -158,5 +161,34 @@ namespace svg
 
     void Rect::draw(PNGImage &img) const{
         Polygon::draw(img);
+    }
+
+    // Group
+
+
+    Group::Group(vector<SVGElement*> childs): childs(childs){}
+
+    Group::~Group(){
+        for (SVGElement* v: childs){
+            delete v;
+        }
+    }
+
+    void Group::draw(PNGImage &img) const{
+        for (SVGElement* v: childs){
+            v::draw(img);
+        }
+    }
+
+    void Group::translate(const Point &t){
+
+    }
+
+    void Group::rotate(const Point &origin, int degrees){
+
+    }
+
+    void Group::scale(const Point &origin, int v){
+
     }
 }

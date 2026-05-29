@@ -55,11 +55,11 @@ namespace svg
 
     class Circle: public Ellipse{
         public:
-            Circle(const Color &fill, const Point &center, const int &radius);
-            void draw(PNGImage &img) const override;
-            void translate(const Point &t) override;
-            void rotate(const Point &origin, int degrees) override;
-            void scale(const Point &origin, int v) override;
+        Circle(const Color &fill, const Point &center, const int &radius);
+        void draw(PNGImage &img) const override;
+        void translate(const Point &t) override;
+        void rotate(const Point &origin, int degrees) override;
+        void scale(const Point &origin, int v) override;
     };
 
     class Polyline: public SVGElement{
@@ -110,6 +110,18 @@ namespace svg
 
         private:
         int x, y, width, height;
+    };
+    class Group: public SVGElement{
+        public:
+        Group(vector<SVGElement*> childs);
+        ~Group();
+        void draw(PNGImage &img) const override;
+        void translate(const Point &t) override;
+        void rotate(const Point &origin, int degrees) override;
+        void scale(const Point &origin, int v) override; 
+
+        protected:
+        vector<SVGElement*> childs;
     };
 };
 
