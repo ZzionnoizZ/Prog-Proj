@@ -14,10 +14,10 @@ svg::Point Recolher(string s);
 int Recolher_rs(string s);
 string funcao(string s);
 string dados (string s);
-
+void processar(XMLElement* elemento, vector<svg::SVGElement*>& svg_elements);
 
 namespace svg
-{
+{   void processar(XMLElement* elemento, vector<SVGElement*>& svg_elements);
     void readSVG(const string& svg_file, Point& dimensions, vector<SVGElement *>& svg_elements)
     {
         XMLDocument doc;
@@ -34,168 +34,62 @@ namespace svg
         // TODO complete code -->
 
         //criar func que retorna pontos
+        for (XMLElement* elemento = xml_elem->FirstChildElement(); elemento != nullptr; elemento = elemento->NextSiblingElement()){
+            processar(elemento, svg_elements);
+        }
+    }
 
-        XMLElement *g = xml_elem->FirstChildElement();
-        for (XMLElement *elemento = g->FirstChildElement(); elemento != nullptr; elemento = elemento->NextSiblingElement()){
-            string name = elemento->Name();
+    void processar(XMLElement* elemento, vector<SVGElement*>& svg_elements){
+        if (!elemento){return;}
+        string name = elemento->Name();
+        SVGElement* elem = nullptr;
             
-            if (name == "ellipse"){
-                int cx = elemento->IntAttribute("cx");
-                int cy = elemento->IntAttribute("cy");
-                const Point center = {cx, cy};
-                int rx = elemento->IntAttribute("rx");
-                int ry = elemento->IntAttribute("ry");
-                const Point radius = {rx, ry};
-                string transform = "";
-                transform = elemento->Attribute("transform");
-                if (transform != ""){
-                    string nome = funcao(transform);
-                    if (nome == "translate"){
-                        Point t = Recolher(dados(transform));
-                        center.translate(t);
-                    }
-                    string trans_or = "";
-                    trans_or = elemento->Attribute("transform-origin");
-                    if (trans_or != ""){
-                        Point o = Recolher(trans_or);
-                        if (nome == "rotate"){
-                            int a = Recolher_rs(dados(transform));
-                            center.rotate(o, a);
-                        }
-                        else if (nome == "scale"){
-                            int a = Recolher_rs(transform);
-                            center.scale(o, a);
-                        }
-                    }
-                    else {
-                        if (nome == "rotate"){
-                            int a = Recolher_rs(dados(transform));
-                            center.rotate({0,0}, a);
-                        }
-                        else if (nome == "scale"){
-                            int a = Recolher_rs(transform);
-                            center.scale({0,0}, a);
-                        }
-                    }
-                }
-                const char* fill = elemento->Attribute("fill");
-                Color cor = parse_color(fill ? fill : "black");
-                svg_elements.push_back(new Ellipse(cor,center,radius));
+        if (name == "ellipse"){
+            int cx = elemento->IntAttribute("cx");
+            int cy = elemento->IntAttribute("cy");
+            const Point center = {cx, cy};
+            int rx = elemento->IntAttribute("rx");
+            int ry = elemento->IntAttribute("ry");
+            const Point radius = {rx, ry};
+            const char* fill = elemento->Attribute("fill");
+            Color cor = parse_color(fill);
+            elem = (new Ellipse(cor,center,radius));
+        }
+        
+        else if (name == "circle"){
+            int cx = elemento->IntAttribute("cx");
+            int cy = elemento->IntAttribute("cy");
+            const Point center = {cx, cy};
+            int r = elemento->IntAttribute("r");
+            const char* fill = elemento->Attribute("fill");
+            Color cor = parse_color(fill);
+            elem = (new Circle(cor,center,r));
+        }
+        else if (name == "polyline"){
+            std::istringstream pontos(elemento-> Attribute("points"));
+            string ponto, func, dados;
+            vector<Point> points;
+            while (pontos >> ponto){
+                Point p =Recolher(ponto);  
+                points.push_back(p);
             }
+            const char* stroke = elemento->Attribute("stroke");
+            Color cor = parse_color(stroke);
+            elem = (new Polyline(points, cor));
             
-            else if (name == "circle"){
-                int cx = elemento->IntAttribute("cx");
-                int cy = elemento->IntAttribute("cy");
-                const Point center = {cx, cy};
-                int r = elemento->IntAttribute("r");
-                string transform = "";
-                transform = elemento->Attribute("transform");
-                if (transform != ""){
-                    string nome = funcao(transform);
-                    if (nome == "translate"){
-                        Point t = Recolher(dados(transform));
-                        center.translate(t);
-                    }
-                    string trans_or = "";
-                    trans_or = elemento->Attribute("transform-origin");
-                    if (trans_or != ""){
-                        Point o = Recolher(trans_or);
-                        if (nome == "rotate"){
-                            int a = Recolher_rs(dados(transform));
-                            center.rotate(o, a);
-                        }
-                        else if (nome == "scale"){
-                            int a = Recolher_rs(transform);
-                            center.scale(o, a);
-                        }
-                    }
-                    else {
-                        if (nome == "rotate"){
-                            int a = Recolher_rs(dados(transform));
-                            center.rotate({0,0}, a);
-                        }
-                        else if (nome == "scale"){
-                            int a = Recolher_rs(transform);
-                            center.scale({0,0}, a);
-                        }
-                    }
-                }
-                const char* fill = elemento->Attribute("fill");
-                Color cor = parse_color(fill ? fill : "black");
-                svg_elements.push_back(new Circle(cor,center,r));
-            }
-
-            else if (name == "polyline"){
-                std::istringstream pontos(elemento-> Attribute("points"));
-                string ponto, func, dados;
-                vector<Point> points;
-                string trans = elemento->Attribute("transform");
-                std::istringstream t(trans);
-                char b1 = '(', b2 = ')';
-                while (pontos >> ponto){
-                    Point p =Recolher(ponto);
-                        if (!trans.empty()){
-                            while (t >> func >> b1 >> dados >> b2){
-                                if (func == "translate"){
-                                    std::istringstream d(dados);
-                                    Point t;
-                                    string x1, y1;
-                                    while (d >> x1 >> y1){
-                                        int x_1 = std::stoi(x1);
-                                        int y_1 = std::stoi(y1);
-                                        t = {x_1, y_1};
-                                    }
-                                    p.translate(t);
-                                }
-                                else if (func == "rotate"){
-                                    int degree = std::stoi(dados);
-                                    string trans_or = elemento->Attribute("transform-origin");
-                                    Point o = Recolher(trans_or);
-                                    p.rotate(o, degree);
-                                }
-                            }
-                        }   
-                    points.push_back(p);
-                }
-                const char* stroke = elemento->Attribute("stroke");
-                Color cor = parse_color(stroke ? stroke : "black");
-                svg_elements.push_back(new Polyline(points, cor));
-                
-            }
-
-            else if (name == "line"){
-                int x1 = elemento->IntAttribute("x1");
-                int y1 = elemento->IntAttribute("y1");
-                int x2 = elemento->IntAttribute("x2");
-                int y2 = elemento->IntAttribute("y2");
-                string func, dados;
-                vector<Point> points;
-                string trans = elemento->Attribute("transform");
-                std::istringstream t(trans);
-                char b1 = '(', b2 = ')';
-                while (t >> func >> b1 >> dados >> b2){
-                    if (!trans.empty()){
-                        Point p1 = {x1, y1};
-                        Point p2 = {x2, y2};
-                        if (trans ==  "translate"){
-                            p1.translate(Recolher(dados));
-                            p2.translate(Recolher(dados));
-                        }
-                        if (trans == "rotate"){
-                            int degree = std::stoi(dados);
-                            string trans_or = elemento->Attribute("transform-origin");
-                            Point o = Recolher(trans_or);
-                            p1.rotate(o, degree);
-                            p2.rotate(o, degree);
-                        }
-                    }
-                }
-                const char* stroke = elemento->Attribute("stroke");
-                Color cor = parse_color(stroke ? stroke : "black");
-                svg_elements.push_back(new Line(x1, y1, x2, y2, cor));
-            }
-
-            else if (name == "polygon"){
+        }
+        else if (name == "line"){
+            int x1 = elemento->IntAttribute("x1");
+              int y1 = elemento->IntAttribute("y1");
+            int x2 = elemento->IntAttribute("x2");
+            int y2 = elemento->IntAttribute("y2");
+            string func, dados;
+            vector<Point> points;
+            const char* stroke = elemento->Attribute("stroke");
+            Color cor = parse_color(stroke);
+            elem = (new Line(x1, y1, x2, y2, cor));
+        }
+        else if (name == "polygon"){
                 std::istringstream pontos(elemento-> Attribute("points"));
                 string ponto;
                 vector<Point> points;
@@ -210,24 +104,50 @@ namespace svg
                     }
                 }
                 const char* fill = elemento->Attribute("fill");
-                Color cor = parse_color(fill ? fill : "black");
-                svg_elements.push_back(new Polygon(points, cor));
+                Color cor = parse_color(fill);
+                elem = (new Polygon(points, cor));
             }
-
-            else if (name == "rect"){
-                int x = elemento->IntAttribute("x");
-                int y = elemento->IntAttribute("y");
-                int width = elemento->IntAttribute("width");
-                int height = elemento->IntAttribute("height");
-                const char* fill = elemento->Attribute("fill");
-                Color cor = parse_color(fill ? fill : "black");
-                svg_elements.push_back(new Rect(x, y, width, height, cor));
-            }
+        else if (name == "rect"){
+            int x = elemento->IntAttribute("x");
+            int y = elemento->IntAttribute("y");
+            int width = elemento->IntAttribute("width");
+            int height = elemento->IntAttribute("height");
+            const char* fill = elemento->Attribute("fill");
+            Color cor = parse_color(fill);
+            elem = (new Rect(x, y, width, height, cor));
         }
-    }   
+        if (elem!=nullptr){
+            const char* transform = elemento->Attribute("transform");
+            Point origin = {0, 0};
+            const char* transform_or = elemento->Attribute("transform-origin");
+            if (transform_or) {
+                origin = Recolher(transform_or); 
+            }
+            if (transform){
+                string nome = funcao(transform);
+                if (nome == "translate"){
+                    Point t = Recolher(dados(transform));
+                    elem->translate(t);
+                }
+                if (nome == "rotate"){
+                    int a = Recolher_rs(dados(transform));
+                    elem->rotate(origin, a);
+                }
+                else if (nome == "scale"){
+                    int a = Recolher_rs(transform);
+                    elem->scale(origin, a);
+                }
+            }
+            svg_elements.push_back(elem);
+        }
+        for (XMLElement* child = elemento->FirstChildElement(); child != nullptr; child = child->NextSiblingElement()) {
+            processar(child, svg_elements);
+        }
+    }
 }
 
 svg::Point Recolher(string s){
+    for(auto &c : s) if(c == ',') c = ' ';
     std::istringstream ss(s);
     string x,y;
     int x_, y_;
@@ -251,12 +171,12 @@ int Recolher_rs(string s){
 }
 
 string funcao(string s){
-    int idx = s.find_first_of('(');
-    return s.substr(0,idx-1);
+    int idx = s.find('(');
+    return s.substr(0,idx);
 }
 
 string dados(string s){
-    int idx_i = s.find_first_of('(');
-    int idx_f = s.find_last_of(')');
-    return s.substr(idx_i+1,idx_f-1);
+    int idx_i = s.find('(');
+    int idx_f = s.find(')');
+    return s.substr(idx_i+1,idx_f-idx_i-1);
 }

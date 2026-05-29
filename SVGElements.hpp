@@ -89,7 +89,7 @@ namespace svg
 
     class Polygon: public SVGElement{
         public:
-        Polygon(const vector<Point> &points, Color &fill);
+        Polygon(const vector<Point> &points, const Color &fill);
         void draw(PNGImage &img) const override;
         void translate(const Point &t) override;
         void rotate(const Point &origin, int degrees) override;
@@ -102,7 +102,7 @@ namespace svg
 
     class Rect: public Polygon{
         public:
-        Rect(int x, int y, int width, int height, Color &fill);        
+        Rect(int x, int y, int width, int height, const Color &fill);        
         void draw(PNGImage &img) const override;
         void translate(const Point &t) override;
         void rotate(const Point &origin, int degrees) override;
