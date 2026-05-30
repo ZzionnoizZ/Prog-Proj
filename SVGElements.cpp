@@ -45,6 +45,10 @@ namespace svg
         radius = radius.scale({0, 0}, v);
     }
 
+    SVGElement* Ellipse::clone() const{
+        return new Ellipse(*this);
+    }
+
     // Circle
 
 
@@ -63,6 +67,10 @@ namespace svg
 
     void Circle::draw(PNGImage &img) const{
         Ellipse::draw(img);
+    }
+
+    SVGElement* Circle::clone() const{
+        return new Circle(*this);
     }
 
     // Polyline
@@ -94,6 +102,10 @@ namespace svg
         }
     }
 
+    SVGElement* Polyline::clone() const{
+        return new Polyline(*this);
+    }
+
     // Line
 
 
@@ -113,6 +125,10 @@ namespace svg
 
     void Line::draw(PNGImage &img) const{
         Polyline::draw(img);
+    }
+
+    SVGElement* Line::clone() const{
+        return new Line(*this);
     }
 
     // Polygon
@@ -142,6 +158,10 @@ namespace svg
         img.draw_polygon(points, fill);
     }
 
+    SVGElement* Polygon::clone() const{
+        return new Polygon(*this);
+    }
+
     // Rect 
 
 
@@ -163,8 +183,13 @@ namespace svg
         Polygon::draw(img);
     }
 
+    SVGElement* Rect::clone() const{
+        return new Rect(*this);
+    }
+
     // Group
 
+    Group::Group():SVGElement(){}
 
     Group::Group(vector<SVGElement*> childs): childs(childs){}
 
@@ -172,23 +197,44 @@ namespace svg
         for (SVGElement* v: childs){
             delete v;
         }
+        childs.clear();
     }
 
     void Group::draw(PNGImage &img) const{
-        for (SVGElement* v: childs){
-            v::draw(img);
+        for (const SVGElement* v: childs){
+            v->draw(img);
         }
     }
 
     void Group::translate(const Point &t){
-
+        for (SVGElement* child : childs) {
+            child->translate(t);
+        }
     }
 
     void Group::rotate(const Point &origin, int degrees){
-
+        for (SVGElement* child : childs) {
+            child->rotate(origin, degrees);
+        }
     }
 
     void Group::scale(const Point &origin, int v){
+        for (SVGElement* child : childs) {
+            child->scale(origin, v);
+        }
+    }
 
+    void Group::add_element(SVGElement* v) {
+        if (v != nullptr) {
+            childs.push_back(v);
+        }
+    }
+
+    SVGElement* Group::clone() const{
+        Group* g = new Group();
+        for (SVGElement* v:childs){
+            g->add_element(v->clone());
+        }
+        return g;
     }
 }

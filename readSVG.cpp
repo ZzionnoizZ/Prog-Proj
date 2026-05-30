@@ -5,6 +5,7 @@
 
 // Novas Bibliotecas
 #include<sstream>
+#include<map>
 
 using namespace std;
 using namespace tinyxml2;
@@ -14,10 +15,13 @@ svg::Point Recolher(string s);
 int Recolher_rs(string s);
 string funcao(string s);
 string dados (string s);
-void processar(XMLElement* elemento, vector<svg::SVGElement*>& svg_elements);
 
 namespace svg
 { 
+    SVGElement* parse_element(XMLElement* elemento);
+
+    map<string, XMLElement*> element_map;
+
     void readSVG(const string& svg_file, Point& dimensions, vector<SVGElement *>& svg_elements)
     {
         XMLDocument doc;
@@ -33,10 +37,23 @@ namespace svg
         
         // TODO complete code -->
 
-        //criar func que retorna pontos
+        element_map.clear();
+
         for (XMLElement* elemento = xml_elem->FirstChildElement(); elemento != nullptr; elemento = elemento->NextSiblingElement()){
+            SVGElement* elem = parse_element(elemento);
+            
+            if (elem) svg_elements.push_back(elem);
+        }
+    }
+
+    SVGElement* parse_element(XMLElement* elemento){
             string name = elemento->Name();
             SVGElement* elem = nullptr;
+
+            const char* id_attr = elemento->Attribute("id");
+            if (id_attr) {
+                element_map[string(id_attr)] = elemento;
+            }
             
             if (name == "ellipse"){
                 int cx = elemento->IntAttribute("cx");
@@ -102,6 +119,23 @@ namespace svg
                 Color cor = parse_color(fill);
                 elem = (new Rect(x, y, width, height, cor));
             }
+            else if (name == "g"){
+                vector<SVGElement*> childs;
+                for (XMLElement* child = elemento->FirstChildElement(); child != nullptr; child = child->NextSiblingElement()){
+                    SVGElement* child_obj = parse_element(child);
+                    if (child_obj) childs.push_back(child_obj);
+                }
+                elem = new Group(childs);
+            }
+            else if (name == "use"){
+                const char* href_attr = elemento->Attribute("href");
+                if (href_attr && href_attr[0] == '#'){
+                    string ref_id = string(href_attr + 1);
+                    if (element_map.find(ref_id) != element_map.end()) {
+                        elem = parse_element(element_map[ref_id]);
+                    }
+                }
+            }
             if (elem!=nullptr){
                 const char* transform = elemento->Attribute("transform");
                 Point origin = {0, 0};
@@ -124,13 +158,9 @@ namespace svg
                         elem->scale(origin, a);
                     }
                 }
-                svg_elements.push_back(elem);
             }
-            for (XMLElement* child = elemento->FirstChildElement(); child != nullptr; child = child->NextSiblingElement()) {
-                readSVG(svg_file, dimensions, svg_elements);
-            }
+            return elem;
         }
-    }
 }
 
 svg::Point Recolher(string s){
