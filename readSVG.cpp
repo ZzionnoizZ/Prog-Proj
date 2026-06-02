@@ -130,7 +130,8 @@ namespace svg
             else if (name == "use"){
                 const char* href_attr = elemento->Attribute("href");
                 if (href_attr && href_attr[0] == '#'){
-                    string ref_id = string(href_attr + 1);
+                    string href = string(href_attr);
+                    string ref_id = href.substr(1, href.size()-1);
                     if (element_map.find(ref_id) != element_map.end()) {
                         elem = parse_element(element_map[ref_id]);
                     }
