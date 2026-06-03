@@ -33,6 +33,7 @@ namespace svg
         
         // TODO complete code -->
 
+        element_map.clear();
         for (XMLElement* elemento = xml_elem->FirstChildElement(); elemento != nullptr; elemento = elemento->NextSiblingElement()){
             SVGElement* elem = parse_element(elemento);
             
