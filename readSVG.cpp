@@ -1,5 +1,3 @@
-
-#include <iostream>
 #include "SVGElements.hpp"
 #include "external/tinyxml2/tinyxml2.h"
 
@@ -12,9 +10,7 @@ using namespace tinyxml2;
 
 // declaração de novas funções
 svg::Point Recolher(string s);
-int Recolher_rs(string s);
-string funcao(string s);
-string dados (string s);
+string dados(string s);
 
 namespace svg
 { 
@@ -37,8 +33,6 @@ namespace svg
         
         // TODO complete code -->
 
-        element_map.clear();
-
         for (XMLElement* elemento = xml_elem->FirstChildElement(); elemento != nullptr; elemento = elemento->NextSiblingElement()){
             SVGElement* elem = parse_element(elemento);
             
@@ -47,15 +41,15 @@ namespace svg
     }
 
     SVGElement* parse_element(XMLElement* elemento){
-            string name = elemento->Name();
-            SVGElement* elem = nullptr;
+        string name = elemento->Name();
+        SVGElement* elem = nullptr;
 
-            const char* id_attr = elemento->Attribute("id");
-            if (id_attr) {
-                element_map[string(id_attr)] = elemento;
-            }
-            
-            if (name == "ellipse"){
+        const char* id_attr = elemento->Attribute("id");
+        if (id_attr) {
+            element_map[string(id_attr)] = elemento;
+        }
+        
+        if (name == "ellipse"){
                 int cx = elemento->IntAttribute("cx");
                 int cy = elemento->IntAttribute("cy");
                 const Point center = {cx, cy};
@@ -85,8 +79,7 @@ namespace svg
                 }
                 const char* stroke = elemento->Attribute("stroke");
                 Color cor = parse_color(stroke);
-                elem = (new Polyline(points, cor));
-                
+                elem = (new Polyline(points, cor)); 
             }
             else if (name == "line"){
                 int x1 = elemento->IntAttribute("x1");
@@ -145,17 +138,19 @@ namespace svg
                     origin = Recolher(transform_or); 
                 }
                 if (transform){
-                    string nome = funcao(transform);
+                    string nome = transform;
+                    int idx = nome.find('(');
+                    nome = nome.substr(0, idx);
                     if (nome == "translate"){
                         Point t = Recolher(dados(transform));
                         elem->translate(t);
                     }
                     if (nome == "rotate"){
-                        int a = Recolher_rs(dados(transform));
+                        int a = stoi(dados(transform));
                         elem->rotate(origin, a);
                     }
                     else if (nome == "scale"){
-                        int a = Recolher_rs(dados(transform));
+                        int a = stoi(dados(transform));
                         elem->scale(origin, a);
                     }
                 }
@@ -174,21 +169,6 @@ svg::Point Recolher(string s){
     }
     svg::Point p = {x_, y_};
     return p;
-
-}
-
-int Recolher_rs(string s){
-    std::istringstream ss(s);
-    int d_, d;
-    while (ss >> d){
-        d_ = d;
-    }
-    return d_;
-}
-
-string funcao(string s){
-    int idx = s.find('(');
-    return s.substr(0,idx);
 }
 
 string dados(string s){

@@ -1,12 +1,5 @@
 #include "SVGElements.hpp"
 
-// Novas Bibliotecas
-#include"Point.hpp"
-#include <iostream>
-#include <sstream>
-#include <vector>
-using std::vector;
-
 namespace svg
 {
     // These must be defined!
