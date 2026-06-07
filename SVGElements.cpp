@@ -182,6 +182,7 @@ namespace svg
 
     // Group
 
+    
     Group::Group():SVGElement(){}
 
     Group::Group(vector<SVGElement*> childs): childs(childs){}
